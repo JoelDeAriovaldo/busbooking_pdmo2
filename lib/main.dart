@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart'; // Import the generated file
+
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/profile/profile_screen.dart';
@@ -12,12 +14,12 @@ import 'screens/tickets/ticket_details_screen.dart';
 import 'screens/travel_info/route_details_screen.dart';
 import 'screens/travel_info/vehicle_info_screen.dart';
 import 'screens/payment/payment_screen.dart';
-import 'firebase_options.dart';
+import 'screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+    options: DefaultFirebaseOptions.currentPlatform, // Provide FirebaseOptions
   );
   runApp(const MyApp());
 }
@@ -33,8 +35,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: '/login',
+      initialRoute: '/',
       routes: {
+        '/': (context) => HomeScreen(),
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/profile': (context) => ProfileScreen(),

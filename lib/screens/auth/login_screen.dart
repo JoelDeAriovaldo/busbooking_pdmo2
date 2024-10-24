@@ -4,6 +4,7 @@ import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_button.dart';
 import '../../utils/constants.dart';
 import '../../utils/helpers.dart';
+import '../booking/search_screen.dart'; // Import SearchScreen
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -53,7 +54,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       Helpers.showAlertDialog(context, 'Error',
                           'Could not sign in with those credentials');
                     } else {
-                      // Navigate to home screen or another screen
+                      // Navigate to SearchScreen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => SearchScreen()),
+                      );
                     }
                   }
                 },
