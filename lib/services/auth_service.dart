@@ -1,18 +1,22 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user.dart' as AppUser;
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Expose _auth and _firestore as public getters
+  firebase_auth.FirebaseAuth get auth => _auth;
+  FirebaseFirestore get firestore => _firestore;
+
   // Register with email and password
-  Future<User?> registerWithEmailAndPassword(
+  Future<firebase_auth.User?> registerWithEmailAndPassword(
       String email, String password, String name, String phoneNumber) async {
     try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      User? user = result.user;
+      firebase_auth.UserCredential result = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
+      firebase_auth.User? user = result.user;
 
       // Create a new document for the user with the uid
       await _firestore.collection('users').doc(user?.uid).set({
@@ -33,12 +37,12 @@ class AuthService {
   }
 
   // Sign in with email and password
-  Future<User?> signInWithEmailAndPassword(
+  Future<firebase_auth.User?> signInWithEmailAndPassword(
       String email, String password) async {
     try {
-      UserCredential result = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      User? user = result.user;
+      firebase_auth.UserCredential result = await _auth
+          .signInWithEmailAndPassword(email: email, password: password);
+      firebase_auth.User? user = result.user;
       return user;
     } catch (e) {
       print(e.toString());
