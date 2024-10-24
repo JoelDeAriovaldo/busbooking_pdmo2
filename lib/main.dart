@@ -12,6 +12,7 @@ import 'screens/tickets/ticket_details_screen.dart';
 import 'screens/travel_info/route_details_screen.dart';
 import 'screens/travel_info/vehicle_info_screen.dart';
 import 'screens/payment/payment_screen.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

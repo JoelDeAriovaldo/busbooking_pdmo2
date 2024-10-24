@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "524298801068",
+    "project_id": "busbooking-pdmo",
+    "storage_bucket": "busbooking-pdmo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:524298801068:android:66789fcc8d2b1d85ce7409",
+        "android_client_info": {
+          "package_name": "com.busbooking.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUxamP14NcdkKd4JRq2oOKAtT6U_bH1sQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
