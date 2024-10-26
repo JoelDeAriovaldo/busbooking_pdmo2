@@ -17,7 +17,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   void _processPayment(double amount) async {
     if (_selectedWallet != null && _phoneController.text.isNotEmpty) {
-      String userId = 'exampleUserId'; // Replace with actual user ID
+      String userId = 'exampleUserId';
 
       try {
         await _paymentService.processPayment(userId, amount, _selectedWallet!);
@@ -26,7 +26,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           SnackBar(content: Text('Payment processed successfully')),
         );
 
-        Navigator.popUntil(context, ModalRoute.withName('/'));
+        // Navigate to MyTicketsScreen
+        Navigator.pushReplacementNamed(context, '/myTickets');
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Payment failed: ${e.toString()}')),
