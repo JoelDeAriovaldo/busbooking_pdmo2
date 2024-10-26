@@ -45,9 +45,9 @@ class Route {
       distanceKm: json['distanceKm'],
       durationMinutes: json['durationMinutes'],
       price: json['price'],
-      availableSchedules: List<String>.from(json['availableSchedules']),
-      stops: List<String>.from(json['stops']),
-      amenities: json['amenities'],
+      availableSchedules: List<String>.from(json['availableSchedules'] ?? []),
+      stops: List<String>.from(json['stops'] ?? []),
+      amenities: json['amenities'] ?? '',
     );
   }
 

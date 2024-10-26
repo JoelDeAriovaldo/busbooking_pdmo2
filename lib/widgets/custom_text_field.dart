@@ -5,17 +5,19 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final bool obscureText;
   final TextInputType keyboardType;
+  final String? Function(String?)? validator;
 
   CustomTextField({
     required this.labelText,
     required this.controller,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -26,6 +28,7 @@ class CustomTextField extends StatelessWidget {
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       ),
+      validator: validator,
     );
   }
 }

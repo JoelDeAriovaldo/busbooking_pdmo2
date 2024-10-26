@@ -10,25 +10,32 @@ class SeatSelectionScreen extends StatefulWidget {
 }
 
 class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
-  int? _selectedSeat;
-  List<int> _bookedSeats = [1, 2, 5, 8]; // Example booked seats
-
-  void _onSeatSelected(int seat) {
-    setState(() {
-      _selectedSeat = seat;
-    });
-  }
+  Set<int> _selectedSeats = {};
+  List<int> _bookedSeats = [1, 2, 5, 8];
 
   @override
   Widget build(BuildContext context) {
-    final AppRoute.Route route =
-        ModalRoute.of(context)!.settings.arguments as AppRoute.Route;
+    // Safely get and validate route argument
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    final AppRoute.Route? route =
+        arguments is AppRoute.Route ? arguments : null;
+
+    if (route == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Error'),
+        ),
+        body: Center(
+          child: Text('Invalid route information'),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Seat'),
+        title: Text('Select Seats'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: Constants.defaultPadding,
         child: Column(
           children: [
@@ -38,24 +45,54 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
               rows: 5,
               columns: 4,
               bookedSeats: _bookedSeats,
+              selectedSeats: _selectedSeats,
               onSeatSelected: _onSeatSelected,
             ),
             SizedBox(height: 16.0),
+            Text('Selected Seats: ${_selectedSeats.join(", ")}'),
+            SizedBox(height: 16.0),
             CustomButton(
-              text: 'Confirm',
-              onPressed: _selectedSeat != null
-                  ? () {
-                      Navigator.pushNamed(context, '/bookingConfirmation',
+              text: 'Continue',
+              onPressed: _selectedSeats.isEmpty
+                  ? () {} // Provide a default no-op function
+                  : () {
+                      final List<int> selectedSeatsList =
+                          _selectedSeats.toList();
+                      if (selectedSeatsList.length > 1) {
+                        Navigator.pushNamed(
+                          context,
+                          '/passengerDetails',
                           arguments: {
                             'route': route,
-                            'seat': _selectedSeat,
-                          });
-                    }
-                  : () {}, // Provide a no-op function when _selectedSeat is null
+                            'seats': selectedSeatsList,
+                          },
+                        );
+                      } else {
+                        Navigator.pushNamed(
+                          context,
+                          '/bookingConfirmation',
+                          arguments: {
+                            'route': route,
+                            'seats': selectedSeatsList,
+                            'seat': selectedSeatsList[0],
+                          },
+                        );
+                      }
+                    },
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _onSeatSelected(int seat) {
+    setState(() {
+      if (_selectedSeats.contains(seat)) {
+        _selectedSeats.remove(seat);
+      } else {
+        _selectedSeats.add(seat);
+      }
+    });
   }
 }

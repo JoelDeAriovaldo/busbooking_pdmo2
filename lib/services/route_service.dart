@@ -56,8 +56,9 @@ class RouteService {
       String routeId, String date) async {
     try {
       DocumentSnapshot doc = await routeCollection.doc(routeId).get();
-      if (doc.exists) {
-        List<String> schedules = List<String>.from(doc['schedules']);
+      final data = doc.data() as Map<String, dynamic>?;
+      if (doc.exists && data != null && data.containsKey('schedules')) {
+        List<String> schedules = List<String>.from(data['schedules']);
         return schedules;
       } else {
         return [];
@@ -78,9 +79,13 @@ class RouteService {
           .get();
       if (querySnapshot.docs.isNotEmpty) {
         DocumentSnapshot doc = querySnapshot.docs.first;
+        final data = doc.data() as Map<String, dynamic>?;
         return {
-          'distance': doc['distance'],
-          'time': doc['time'],
+          'distance': data != null && data.containsKey('distance')
+              ? data['distance']
+              : null,
+          'time':
+              data != null && data.containsKey('time') ? data['time'] : null,
         };
       } else {
         return null;
@@ -95,7 +100,12 @@ class RouteService {
   Future<Route?> getRouteById(String id) async {
     try {
       DocumentSnapshot doc = await routeCollection.doc(id).get();
-      return Route.fromJson(doc.data() as Map<String, dynamic>);
+      final data = doc.data() as Map<String, dynamic>?;
+      if (data != null) {
+        return Route.fromJson(data);
+      } else {
+        return null;
+      }
     } catch (e) {
       print(e.toString());
       return null;
