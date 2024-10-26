@@ -40,27 +40,6 @@ class _HomeScreenState extends State<HomeScreen>
             color: Constants.primaryColor,
           ),
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Constants.primaryColor,
-          indicatorWeight: 3,
-          labelColor: Constants.primaryColor,
-          unselectedLabelColor: Constants.textSecondaryColor,
-          tabs: [
-            Tab(
-              icon: Icon(LucideIcons.search),
-              text: 'Buscar',
-            ),
-            Tab(
-              icon: Icon(LucideIcons.ticket),
-              text: 'Passagens',
-            ),
-            Tab(
-              icon: Icon(LucideIcons.user),
-              text: 'Perfil',
-            ),
-          ],
-        ),
       ),
       body: TabBarView(
         controller: _tabController,
@@ -68,6 +47,31 @@ class _HomeScreenState extends State<HomeScreen>
           SearchScreen(),
           MyTicketsScreen(),
           ProfileScreen(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _tabController.index,
+        onTap: (index) {
+          setState(() {
+            _tabController.index = index;
+          });
+        },
+        backgroundColor: Constants.surfaceColor,
+        selectedItemColor: Constants.primaryColor,
+        unselectedItemColor: Constants.textSecondaryColor,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.search),
+            label: 'Buscar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.ticket),
+            label: 'Passagens',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.user),
+            label: 'Perfil',
+          ),
         ],
       ),
     );

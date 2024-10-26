@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../models/route.dart' as AppRoute;
 import '../../utils/constants.dart';
 import '../../widgets/custom_button.dart';
@@ -26,10 +27,10 @@ class _PassengerDetailsScreenState extends State<PassengerDetailsScreen> {
     if (args is! Map<String, dynamic>) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Error'),
+          title: Text('Erro'),
         ),
         body: Center(
-          child: Text('Invalid passenger information'),
+          child: Text('Informação de passageiro inválida'),
         ),
       );
     }
@@ -40,17 +41,16 @@ class _PassengerDetailsScreenState extends State<PassengerDetailsScreen> {
     if (route == null || seats == null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Error'),
+          title: Text('Erro'),
         ),
         body: Center(
-          child: Text('Missing route or seat information'),
+          child: Text('Informação de rota ou assento ausente'),
         ),
       );
     }
 
     if (_passengersControllers.isEmpty) {
       for (int i = 0; i < seats.length; i++) {
-        // Start from 0 to include all seats
         _passengersControllers.add({
           'name': TextEditingController(),
           'phone': TextEditingController(),
@@ -59,8 +59,19 @@ class _PassengerDetailsScreenState extends State<PassengerDetailsScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Constants.backgroundColor,
       appBar: AppBar(
-        title: Text('Passenger Details'),
+        elevation: 0,
+        backgroundColor: Constants.surfaceColor,
+        leading: IconButton(
+          icon: Icon(LucideIcons.arrowLeft, color: Constants.textColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Detalhes do Passageiro',
+          style: TextStyle(
+              color: Constants.textColor, fontWeight: FontWeight.w600),
+        ),
       ),
       body: SingleChildScrollView(
         padding: Constants.defaultPadding,
@@ -69,14 +80,20 @@ class _PassengerDetailsScreenState extends State<PassengerDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Route: ${route.startLocation} to ${route.endLocation}'),
+              Text(
+                'Rota: ${route.startLocation} para ${route.endLocation}',
+                style: Constants.headingStyle,
+              ),
               SizedBox(height: 16.0),
-              Text('Selected Seats: ${seats.join(", ")}'),
+              Text(
+                'Assentos Selecionados: ${seats.join(", ")}',
+                style: Constants.subheadingStyle,
+              ),
               SizedBox(height: 24.0),
               ..._buildPassengerForms(seats),
               SizedBox(height: 24.0),
               CustomButton(
-                text: 'Continue to Payment',
+                text: 'Continuar para Pagamento',
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     List<Map<String, String>> passengers = [];
@@ -108,29 +125,34 @@ class _PassengerDetailsScreenState extends State<PassengerDetailsScreen> {
 
   List<Widget> _buildPassengerForms(List<int> seats) {
     List<Widget> forms = [];
-    for (int i = 1; i < seats.length; i++) {
+    for (int i = 0; i < seats.length; i++) {
       forms.addAll([
-        Text('Passenger ${i + 1} (Seat ${seats[i]})',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          'Passageiro ${i + 1} (Assento ${seats[i]})',
+          style: Constants.subheadingStyle.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Constants.textColor,
+          ),
+        ),
         SizedBox(height: 8.0),
         CustomTextField(
-          labelText: 'Full Name',
-          controller: _passengersControllers[i - 1]['name']!,
+          labelText: 'Nome Completo',
+          controller: _passengersControllers[i]['name']!,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter passenger name';
+              return 'Por favor, insira o nome do passageiro';
             }
             return null;
           },
         ),
         SizedBox(height: 8.0),
         CustomTextField(
-          labelText: 'Phone Number',
-          controller: _passengersControllers[i - 1]['phone']!,
+          labelText: 'Número de Telefone',
+          controller: _passengersControllers[i]['phone']!,
           keyboardType: TextInputType.phone,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter phone number';
+              return 'Por favor, insira o número de telefone';
             }
             return null;
           },

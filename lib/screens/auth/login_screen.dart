@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -51,38 +52,51 @@ class _LoginScreenState extends State<LoginScreen> {
                   labelText: 'E-mail',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  prefixIcon:
+                      Icon(LucideIcons.mail, color: Constants.primaryColor),
                 ),
                 SizedBox(height: 24),
                 CustomTextField(
                   labelText: 'Senha',
                   controller: _passwordController,
                   obscureText: true,
+                  prefixIcon:
+                      Icon(LucideIcons.lock, color: Constants.primaryColor),
                 ),
                 SizedBox(height: 32),
-                CustomButton(
-                  text: 'Entrar',
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      dynamic result =
-                          await _authService.signInWithEmailAndPassword(
-                        _emailController.text,
-                        _passwordController.text,
-                      );
-                      if (result == null) {
-                        Helpers.showAlertDialog(
-                          context,
-                          'Erro',
-                          'Não foi possível fazer login com essas credenciais',
-                        );
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
-                        );
-                      }
-                    }
-                  },
-                ),
+                _isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : CustomButton(
+                        text: 'Entrar',
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            dynamic result =
+                                await _authService.signInWithEmailAndPassword(
+                              _emailController.text,
+                              _passwordController.text,
+                            );
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            if (result == null) {
+                              Helpers.showAlertDialog(
+                                context,
+                                'Erro',
+                                'Email não cadastrado ou senha incorreta',
+                              );
+                            } else {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomeScreen()),
+                              );
+                            }
+                          }
+                        },
+                      ),
                 SizedBox(height: 16),
                 Center(
                   child: TextButton(

@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
   final Widget? prefixIcon;
+  final Function(String)? onChanged;
 
   const CustomTextField({
     required this.labelText,
@@ -16,6 +17,7 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType,
     this.validator,
     this.prefixIcon,
+    this.onChanged,
   });
 
   @override
@@ -26,6 +28,7 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keyboardType,
       style: Constants.bodyTextStyle,
       validator: validator,
+      onChanged: onChanged,
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: Constants.subheadingStyle,

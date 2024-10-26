@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/route.dart' as AppRoute;
 import '../../models/ticket.dart';
@@ -15,10 +16,10 @@ class BookingConfirmationScreen extends StatelessWidget {
     if (args == null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Error'),
+          title: Text('Erro'),
         ),
         body: Center(
-          child: Text('No booking information provided'),
+          child: Text('Nenhuma informação de reserva fornecida'),
         ),
       );
     }
@@ -28,29 +29,90 @@ class BookingConfirmationScreen extends StatelessWidget {
     if (seat == null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Error'),
+          title: Text('Erro'),
         ),
         body: Center(
-          child: Text('No seat information provided'),
+          child: Text('Nenhuma informação de assento fornecida'),
         ),
       );
     }
 
     return Scaffold(
+      backgroundColor: Constants.backgroundColor,
       appBar: AppBar(
-        title: Text('Booking Confirmation'),
+        elevation: 0,
+        backgroundColor: Constants.surfaceColor,
+        leading: IconButton(
+          icon: Icon(LucideIcons.arrowLeft, color: Constants.textColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Confirmação de Reserva',
+          style: TextStyle(
+              color: Constants.textColor, fontWeight: FontWeight.w600),
+        ),
       ),
       body: Padding(
         padding: Constants.defaultPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Route: ${route.startLocation} to ${route.endLocation}'),
-            SizedBox(height: 8.0),
-            Text('Seat Number: $seat'),
-            SizedBox(height: 16.0),
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(Constants.borderRadius),
+                side: BorderSide(color: Constants.surfaceColor),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(Constants.borderRadius),
+                  gradient: LinearGradient(
+                    colors: [Constants.primaryColor, Constants.secondaryColor],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(LucideIcons.mapPin,
+                              size: 20, color: Constants.textColor),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              '${route.startLocation} → ${route.endLocation}',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Constants.textColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Icon(LucideIcons.armchair,
+                              size: 20, color: Constants.textColor),
+                          SizedBox(width: 12),
+                          Text(
+                            'Número do Assento: $seat',
+                            style: TextStyle(color: Constants.textColor),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 24.0),
             CustomButton(
-              text: 'Confirm Booking',
+              text: 'Confirmar Reserva',
               onPressed: () async {
                 String userId = 'exampleUserId'; // Replace with actual user ID
                 String vehicleId =
