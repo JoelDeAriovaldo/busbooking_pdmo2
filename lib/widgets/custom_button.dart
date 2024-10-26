@@ -4,30 +4,51 @@ import '../utils/constants.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color color;
-  final TextStyle textStyle;
 
-  CustomButton({
+  const CustomButton({
     required this.text,
     required this.onPressed,
-    this.color = Constants.primaryColor,
-    this.textStyle = const TextStyle(color: Colors.white),
   });
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
+    return Container(
+      width: double.infinity,
+      height: Constants.buttonHeight,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Constants.primaryColor,
+            Constants.primaryColor.withOpacity(0.8),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
         ),
+        borderRadius: BorderRadius.circular(Constants.borderRadius),
+        boxShadow: [
+          BoxShadow(
+            color: Constants.primaryColor.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
-      onPressed: onPressed,
-      child: Text(
-        text,
-        style: textStyle,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(Constants.borderRadius),
+          ),
+        ),
+        child: Text(
+          text,
+          style: Constants.bodyTextStyle.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       ),
     );
   }

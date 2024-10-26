@@ -1,10 +1,11 @@
-import 'package:busbooking_pdmo/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_button.dart';
 import '../../utils/constants.dart';
 import '../../utils/helpers.dart';
+import '../home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -20,57 +21,84 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: Padding(
-        padding: Constants.defaultPadding,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              CustomTextField(
-                labelText: 'Email',
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              SizedBox(height: 16.0),
-              CustomTextField(
-                labelText: 'Password',
-                controller: _passwordController,
-                obscureText: true,
-              ),
-              SizedBox(height: 16.0),
-              CustomButton(
-                text: 'Login',
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    dynamic result =
-                        await _authService.signInWithEmailAndPassword(
-                      _emailController.text,
-                      _passwordController.text,
-                    );
-                    if (result == null) {
-                      Helpers.showAlertDialog(context, 'Error',
-                          'Could not sign in with those credentials');
-                    } else {
-                      // Navigate to SearchScreen
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
+      backgroundColor: Constants.backgroundColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: Constants.defaultPadding,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 40),
+                Icon(
+                  LucideIcons.logIn,
+                  size: 48,
+                  color: Constants.primaryColor,
+                ),
+                SizedBox(height: 24),
+                Text(
+                  'Bem-vindo de volta',
+                  style: Constants.headingStyle,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Faça login para continuar',
+                  style: Constants.subheadingStyle,
+                ),
+                SizedBox(height: 48),
+                CustomTextField(
+                  labelText: 'E-mail',
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 24),
+                CustomTextField(
+                  labelText: 'Senha',
+                  controller: _passwordController,
+                  obscureText: true,
+                ),
+                SizedBox(height: 32),
+                CustomButton(
+                  text: 'Entrar',
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      dynamic result =
+                          await _authService.signInWithEmailAndPassword(
+                        _emailController.text,
+                        _passwordController.text,
                       );
+                      if (result == null) {
+                        Helpers.showAlertDialog(
+                          context,
+                          'Erro',
+                          'Não foi possível fazer login com essas credenciais',
+                        );
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        );
+                      }
                     }
-                  }
-                },
-              ),
-              TextButton(
-                onPressed: () {
-                  // Navigate to register screen
-                  Navigator.pushNamed(context, '/register');
-                },
-                child: Text('Don\'t have an account? Register'),
-              ),
-            ],
+                  },
+                ),
+                SizedBox(height: 16),
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/register');
+                    },
+                    child: Text(
+                      'Não tem uma conta? Cadastre-se',
+                      style: Constants.bodyTextStyle.copyWith(
+                        color: Constants.primaryColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

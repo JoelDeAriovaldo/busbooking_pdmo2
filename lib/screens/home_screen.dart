@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'booking/search_screen.dart';
 import 'tickets/my_tickets_screen.dart';
 import 'profile/profile_screen.dart';
+import '../utils/constants.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -27,14 +29,36 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Constants.backgroundColor,
       appBar: AppBar(
-        title: Text('Bus Booking App'),
+        backgroundColor: Constants.surfaceColor,
+        elevation: 0,
+        title: Text(
+          'BusBooking',
+          style: Constants.headingStyle.copyWith(
+            fontSize: 24,
+            color: Constants.primaryColor,
+          ),
+        ),
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: Constants.primaryColor,
+          indicatorWeight: 3,
+          labelColor: Constants.primaryColor,
+          unselectedLabelColor: Constants.textSecondaryColor,
           tabs: [
-            Tab(icon: Icon(Icons.search), text: 'Search'),
-            Tab(icon: Icon(Icons.rocket), text: 'My Tickets'),
-            Tab(icon: Icon(Icons.person), text: 'Profile'),
+            Tab(
+              icon: Icon(LucideIcons.search),
+              text: 'Buscar',
+            ),
+            Tab(
+              icon: Icon(LucideIcons.ticket),
+              text: 'Passagens',
+            ),
+            Tab(
+              icon: Icon(LucideIcons.user),
+              text: 'Perfil',
+            ),
           ],
         ),
       ),

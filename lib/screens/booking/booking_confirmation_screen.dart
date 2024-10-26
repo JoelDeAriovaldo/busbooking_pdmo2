@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import '../../models/route.dart' as AppRoute;
+import '../../models/ticket.dart';
+import '../../services/ticket_service.dart';
 import '../../utils/constants.dart';
 import '../../widgets/custom_button.dart';
 
@@ -48,7 +51,29 @@ class BookingConfirmationScreen extends StatelessWidget {
             SizedBox(height: 16.0),
             CustomButton(
               text: 'Confirm Booking',
-              onPressed: () {
+              onPressed: () async {
+                String userId = 'exampleUserId'; // Replace with actual user ID
+                String vehicleId =
+                    'exampleVehicleId'; // Replace with actual vehicle ID
+                String passengerName =
+                    'examplePassengerName'; // Replace with actual passenger name
+                DateTime bookingDate = DateTime.now();
+                DateTime travelDate = DateTime.now().add(Duration(days: 1));
+
+                Ticket ticket = Ticket(
+                  id: Uuid().v4(),
+                  userId: userId,
+                  routeId: route.id,
+                  vehicleId: vehicleId,
+                  seatNumber: seat.toString(),
+                  bookingDate: bookingDate,
+                  travelDate: travelDate,
+                  passengerName: passengerName,
+                );
+
+                // Save ticket to Firestore
+                await TicketService().createTicket(ticket);
+
                 Navigator.pushNamed(
                   context,
                   '/payment',

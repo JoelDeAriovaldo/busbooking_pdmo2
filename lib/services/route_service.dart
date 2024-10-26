@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/route.dart';
+import '../models/vehicle.dart';
+import 'vehicle_service.dart';
 
 class RouteService {
   final CollectionReference routeCollection =
       FirebaseFirestore.instance.collection('routes');
+  final VehicleService _vehicleService = VehicleService();
 
   // Fetch all unique start locations
   Future<List<String>> getStartLocations() async {
@@ -56,13 +59,13 @@ class RouteService {
       String routeId, String date) async {
     try {
       DocumentSnapshot doc = await routeCollection.doc(routeId).get();
-      final data = doc.data() as Map<String, dynamic>?;
-      if (doc.exists && data != null && data.containsKey('schedules')) {
-        List<String> schedules = List<String>.from(data['schedules']);
-        return schedules;
-      } else {
-        return [];
+      if (doc.exists && doc.data() != null) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data.containsKey('schedules')) {
+          return List<String>.from(data['schedules']);
+        }
       }
+      return [];
     } catch (e) {
       print(e.toString());
       return [];
@@ -79,17 +82,15 @@ class RouteService {
           .get();
       if (querySnapshot.docs.isNotEmpty) {
         DocumentSnapshot doc = querySnapshot.docs.first;
-        final data = doc.data() as Map<String, dynamic>?;
-        return {
-          'distance': data != null && data.containsKey('distance')
-              ? data['distance']
-              : null,
-          'time':
-              data != null && data.containsKey('time') ? data['time'] : null,
-        };
-      } else {
-        return null;
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data.containsKey('distance') && data.containsKey('time')) {
+          return {
+            'distance': data['distance'],
+            'time': data['time'],
+          };
+        }
       }
+      return null;
     } catch (e) {
       print(e.toString());
       return null;
@@ -100,15 +101,64 @@ class RouteService {
   Future<Route?> getRouteById(String id) async {
     try {
       DocumentSnapshot doc = await routeCollection.doc(id).get();
-      final data = doc.data() as Map<String, dynamic>?;
-      if (data != null) {
-        return Route.fromJson(data);
-      } else {
-        return null;
-      }
+      return Route.fromJson(doc.data() as Map<String, dynamic>);
     } catch (e) {
       print(e.toString());
       return null;
+    }
+  }
+
+  // Get route with available vehicles
+  Future<Map<String, dynamic>> getRouteWithVehicles(String routeId) async {
+    try {
+      DocumentSnapshot routeDoc = await routeCollection.doc(routeId).get();
+      if (!routeDoc.exists) {
+        throw Exception('Route not found');
+      }
+
+      Route route = Route.fromJson(routeDoc.data() as Map<String, dynamic>);
+      List<Vehicle> vehicles =
+          await _vehicleService.getVehiclesByRoute(routeId);
+
+      return {
+        'route': route,
+        'vehicles': vehicles,
+      };
+    } catch (e) {
+      print('Error getting route with vehicles: $e');
+      throw e;
+    }
+  }
+
+  // Assign vehicle to route
+  Future<void> assignVehicleToRoute(String routeId, String vehicleId) async {
+    try {
+      // Start a transaction to ensure data consistency
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        // Get current route data
+        DocumentSnapshot routeDoc =
+            await transaction.get(routeCollection.doc(routeId));
+        List<String> assignedVehicles =
+            List<String>.from(routeDoc['assignedVehicles'] ?? []);
+
+        // Add vehicle if not already assigned
+        if (!assignedVehicles.contains(vehicleId)) {
+          assignedVehicles.add(vehicleId);
+
+          // Update route document
+          transaction.update(routeCollection.doc(routeId), {
+            'assignedVehicles': assignedVehicles,
+          });
+
+          // Update vehicle document
+          transaction.update(_vehicleService.vehicleCollection.doc(vehicleId), {
+            'currentRouteId': routeId,
+          });
+        }
+      });
+    } catch (e) {
+      print('Error assigning vehicle to route: $e');
+      throw e;
     }
   }
 }
