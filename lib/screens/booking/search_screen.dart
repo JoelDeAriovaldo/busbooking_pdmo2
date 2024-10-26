@@ -21,6 +21,8 @@ class _SearchScreenState extends State<SearchScreen> {
   List<String> _endLocations = [];
   int? _distance;
   int? _time;
+  bool _isLoadingLocations = false;
+  bool _isLoadingRoutes = false;
 
   @override
   void initState() {
@@ -29,17 +31,25 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _fetchStartLocations() async {
+    setState(() {
+      _isLoadingLocations = true;
+    });
     List<String> startLocations = await RouteService().getStartLocations();
     setState(() {
       _startLocations = startLocations;
+      _isLoadingLocations = false;
     });
   }
 
   void _fetchEndLocations(String startLocation) async {
+    setState(() {
+      _isLoadingLocations = true;
+    });
     List<String> endLocations =
         await RouteService().getEndLocations(startLocation);
     setState(() {
       _endLocations = endLocations;
+      _isLoadingLocations = false;
     });
   }
 
@@ -47,9 +57,14 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_selectedStartLocation == null ||
         _selectedEndLocation == null ||
         _dateController.text.isEmpty) {
-      Helpers.showAlertDialog(context, 'Error', 'Please fill all fields');
+      Helpers.showAlertDialog(
+          context, 'Campos Incompletos', 'Por favor, preencha todos os campos');
       return;
     }
+
+    setState(() {
+      _isLoadingRoutes = true;
+    });
 
     String startLocation = _selectedStartLocation!;
     String endLocation = _selectedEndLocation!;
@@ -59,6 +74,7 @@ class _SearchScreenState extends State<SearchScreen> {
         await RouteService().searchRoutes(startLocation, endLocation);
     setState(() {
       _routes = routes;
+      _isLoadingRoutes = false;
     });
 
     if (_routes.isNotEmpty) {
@@ -87,7 +103,7 @@ class _SearchScreenState extends State<SearchScreen> {
       firstDate: DateTime.now(),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != DateTime.now()) {
+    if (picked != null) {
       setState(() {
         _dateController.text = "${picked.toLocal()}".split(' ')[0];
       });
@@ -142,83 +158,87 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildRouteCard(AppRoute.Route route) {
-    return Card(
-      color: Constants.surfaceColor,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(Constants.borderRadius),
-        side: BorderSide(
-          color: Constants.textSecondaryColor.withOpacity(0.1),
+    return AnimatedOpacity(
+      opacity: _routes.isNotEmpty ? 1.0 : 0.0,
+      duration: Duration(milliseconds: 500),
+      child: Card(
+        color: Constants.surfaceColor,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Constants.borderRadius),
+          side: BorderSide(
+            color: Constants.textSecondaryColor.withOpacity(0.1),
+          ),
         ),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(Constants.borderRadius),
-        onTap: () {
-          Navigator.pushNamed(context, '/seatSelection', arguments: route);
-        },
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    LucideIcons.bus,
-                    color: Constants.primaryColor,
-                    size: 24,
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          route.startLocation,
-                          style: Constants.bodyTextStyle.copyWith(
-                            fontWeight: FontWeight.bold,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(Constants.borderRadius),
+          onTap: () {
+            Navigator.pushNamed(context, '/seatSelection', arguments: route);
+          },
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.bus,
+                      color: Constants.primaryColor,
+                      size: 24,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            route.startLocation,
+                            style: Constants.bodyTextStyle.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                          SizedBox(height: 4),
+                          Text(
+                            route.endLocation,
+                            style: Constants.bodyTextStyle,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.clock,
+                          color: Constants.textSecondaryColor,
+                          size: 16,
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(width: 4),
                         Text(
-                          route.endLocation,
-                          style: Constants.bodyTextStyle,
+                          '${route.duration.inHours}h ${route.duration.inMinutes % 60}m',
+                          style: Constants.bodyTextStyle.copyWith(
+                            color: Constants.textSecondaryColor,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        LucideIcons.clock,
-                        color: Constants.textSecondaryColor,
-                        size: 16,
-                      ),
-                      SizedBox(width: 4),
+                    if (_schedules.isNotEmpty)
                       Text(
-                        '${route.duration.inHours}h ${route.duration.inMinutes % 60}m',
+                        _schedules.join(', '),
                         style: Constants.bodyTextStyle.copyWith(
-                          color: Constants.textSecondaryColor,
+                          color: Constants.primaryColor,
                         ),
                       ),
-                    ],
-                  ),
-                  if (_schedules.isNotEmpty)
-                    Text(
-                      _schedules.join(', '),
-                      style: Constants.bodyTextStyle.copyWith(
-                        color: Constants.primaryColor,
-                      ),
-                    ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -242,30 +262,34 @@ class _SearchScreenState extends State<SearchScreen> {
             style: Constants.subheadingStyle,
           ),
           SizedBox(height: 32),
-          _buildLocationDropdown(
-            hint: 'Local de partida',
-            value: _selectedStartLocation,
-            items: _startLocations,
-            onChanged: (newValue) {
-              setState(() {
-                _selectedStartLocation = newValue;
-                _selectedEndLocation = null;
-                _endLocations = [];
-              });
-              _fetchEndLocations(newValue!);
-            },
-          ),
+          _isLoadingLocations
+              ? Center(child: CircularProgressIndicator())
+              : _buildLocationDropdown(
+                  hint: 'Local de partida',
+                  value: _selectedStartLocation,
+                  items: _startLocations,
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedStartLocation = newValue;
+                      _selectedEndLocation = null;
+                      _endLocations = [];
+                    });
+                    _fetchEndLocations(newValue!);
+                  },
+                ),
           SizedBox(height: 16),
-          _buildLocationDropdown(
-            hint: 'Local de chegada',
-            value: _selectedEndLocation,
-            items: _endLocations,
-            onChanged: (newValue) {
-              setState(() {
-                _selectedEndLocation = newValue;
-              });
-            },
-          ),
+          _isLoadingLocations
+              ? Center(child: CircularProgressIndicator())
+              : _buildLocationDropdown(
+                  hint: 'Local de chegada',
+                  value: _selectedEndLocation,
+                  items: _endLocations,
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedEndLocation = newValue;
+                    });
+                  },
+                ),
           SizedBox(height: 16),
           GestureDetector(
             onTap: () => _selectDate(context),
@@ -302,9 +326,12 @@ class _SearchScreenState extends State<SearchScreen> {
           SizedBox(height: 32),
           CustomButton(
             text: 'Buscar rotas',
+            icon: Icon(LucideIcons.search, color: Constants.textColor),
             onPressed: _searchRoutes,
           ),
-          if (_distance != null && _time != null) ...[
+          if (_isLoadingRoutes)
+            Center(child: CircularProgressIndicator())
+          else if (_distance != null && _time != null) ...[
             SizedBox(height: 24),
             Container(
               padding: EdgeInsets.all(16),
@@ -324,10 +351,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       SizedBox(height: 8),
                       Text(
                         '$_distance km',
-                        style: Constants.bodyTextStyle,
+                        style: Constants.bodyTextStyle.copyWith(
+                          color: Colors.blue,
+                        ),
                       ),
                       Text(
-                        'Distância',
+                        'Est. Distância',
                         style: Constants.subheadingStyle,
                       ),
                     ],
@@ -341,10 +370,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       SizedBox(height: 8),
                       Text(
                         '$_time min',
-                        style: Constants.bodyTextStyle,
+                        style: Constants.bodyTextStyle.copyWith(
+                          color: Colors.red,
+                        ),
                       ),
                       Text(
-                        'Duração',
+                        'Est. Tempo',
                         style: Constants.subheadingStyle,
                       ),
                     ],
@@ -364,7 +395,9 @@ class _SearchScreenState extends State<SearchScreen> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemCount: _routes.length,
-              separatorBuilder: (context, index) => SizedBox(height: 16),
+              separatorBuilder: (context, index) => Divider(
+                color: Constants.textSecondaryColor.withOpacity(0.1),
+              ),
               itemBuilder: (context, index) => _buildRouteCard(_routes[index]),
             ),
           ],

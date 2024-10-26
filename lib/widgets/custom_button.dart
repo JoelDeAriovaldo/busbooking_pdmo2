@@ -4,10 +4,12 @@ import '../utils/constants.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
+  final Widget? icon;
 
   const CustomButton({
     required this.text,
     required this.onPressed,
+    this.icon,
   });
 
   @override
@@ -33,7 +35,7 @@ class CustomButton extends StatelessWidget {
           ),
         ],
       ),
-      child: ElevatedButton(
+      child: ElevatedButton.icon(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
@@ -42,7 +44,8 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(Constants.borderRadius),
           ),
         ),
-        child: Text(
+        icon: icon ?? SizedBox.shrink(),
+        label: Text(
           text,
           style: Constants.bodyTextStyle.copyWith(
             fontWeight: FontWeight.bold,
